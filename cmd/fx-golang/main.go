@@ -8,6 +8,10 @@ import (
 )
 
 func main() {
+	var a *logger.Logger
+	// a = logger.NewLogger()
+	// a.WithPrefix("testing-replace: ")
+
 	app := fx.New(
 		logger.Module,
 		fx.Invoke(service.RunFirst),
@@ -15,6 +19,15 @@ func main() {
 		fx.Invoke(service.RunThird),
 		fx.Invoke(service.RegisterFirstHook),
 		fx.Invoke(service.RegisterSecondHook),
+		fx.Decorate(func(logger service.ILogger) service.ILogger {
+			logger.WithPrefix("testing-decorate: ")
+			return logger
+		}),
+		// fx.Replace(
+		// 	fx.Annotate(a, fx.As(new(service.ILogger))),
+		// ),
+		fx.Populate(&a),
+		fx.Invoke(service.RunWithPAramStruct),
 	)
 	app.Run()
 }
